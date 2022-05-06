@@ -1,9 +1,10 @@
 import { gql, useMutation } from "@apollo/client"
 import React, { useState } from 'react';
+import { useHistory } from "react-router-dom";
 
 
 const CREATE_PATIENT_MUTATION = gql`
-mutation onCreatePatientMutation($name : String!, $dob : String!, $place : String!, $bloodGroup : String,$gender : String!, $height : Int, $weight : Int){
+mutation onCreatePatientMutation($name : String!, $dob : String!, $place : String!, $bloodGroup : String,$gender : String!, $height : String, $weight : String){
     createPatient(data : {
         name : $name,
         dob : $dob,
@@ -18,16 +19,18 @@ mutation onCreatePatientMutation($name : String!, $dob : String!, $place : Strin
 }
 `
 
-const AddPatient = () => {
+const Administrator = () => {
+
+    const history = useHistory()
     
-    const [patientState, setPatientState] = useState<{name : string, dob: string, place : string, gender : string, bloodGroup : string, height : number, weight : number}>({
+    const [patientState, setPatientState] = useState<{name : string, dob: string, place : string, gender : string, bloodGroup : string, height : string, weight : string}>({
         name : '',
         dob : '',
         place: '',
         gender : '',
         bloodGroup : '',
-        height : 0,
-        weight : 0
+        height : '',
+        weight : ''
 
     })
 
@@ -45,11 +48,15 @@ const AddPatient = () => {
                 height : patientState.height,
                 weight : patientState.weight
             }
-        }).then(response => console.log("RESPONSE -> ", response))
+            
+        }).then(response => {
+            history.replace("/home")
+            alert("patient data saved successfully")
+        })
     }
 
     const cancelClickHandler = () => {
-       
+        history.replace("/home")
     }
     
     const nameChangeHadler : React.ChangeEventHandler<HTMLInputElement> = (event) =>  setPatientState({...patientState, name : event.target.value});
@@ -57,8 +64,8 @@ const AddPatient = () => {
     const genderSeletHandler : React.ChangeEventHandler<HTMLSelectElement> = (event) => setPatientState({...patientState, gender : event.target.value});
     const placeChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event) => setPatientState({...patientState, place : event.target.value});
     const bloodGroupChangeHandler : React.ChangeEventHandler<HTMLSelectElement> = (event) => setPatientState({...patientState, bloodGroup : event.target.value});
-    const heightChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event) => setPatientState({...patientState, height : Number(event.target.value)});
-    const wieghtChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event) => setPatientState({...patientState, weight : Number(event.target.value)});
+    const heightChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event) => setPatientState({...patientState, height :event.target.value});
+    const wieghtChangeHandler : React.ChangeEventHandler<HTMLInputElement> = (event) => setPatientState({...patientState, weight :event.target.value});
     
     const submitHandler : React.FormEventHandler = (event) => {
         event.preventDefault();
@@ -71,6 +78,7 @@ const AddPatient = () => {
                     <div className="card-header">
                         <h3 className="text-center">Patient Form</h3>
                     </div>
+                    {/* patient name */}
                     <div className="card-body">
                         <div className="form-body">
                             <form onSubmit={submitHandler}>
@@ -83,38 +91,37 @@ const AddPatient = () => {
                                 className='form-control' />
                             </form>
                         </div>
-                        <br />
+                        {/* DOB */}
                         <div className="form-group">
                             <label htmlFor="dob">Date Of Birth : </label>
                             <input type='date' 
                             name='dob'
                             id='dob'
                             className='form-control'
-                            value={patientState.dob}
                             onChange={DOBChangeHadler} />
                         </div>
-                        <br />
+                        {/* gender */}
                         <div className="form-group">
                             <label htmlFor="gender">Gender : </label>
-                            <select name="gender" value={patientState.gender} onChange={genderSeletHandler}>
+                            <select name="gender" value={patientState.gender} onChange={genderSeletHandler} className="form-control">
                                 <option>Select an option </option>
                                 <option value="male">male</option>
                                 <option value="female">female</option>
+                                <option value="others">others</option>
                             </select>
                         </div>
-                        <br />
+                        {/* place of Birth */}
                         <div className="form-group">
                             <label htmlFor="place">Place Of Birth : </label>
                             <input type="text" 
                             name='place'
-                            id='place' 
+                            id='place' className="form-control"
                             value={patientState.place}
                             onChange={placeChangeHandler}/>
                         </div>
-                        <br />
                         <div className="form-group">
                             <label htmlFor="blood-group">Blood Group</label>
-                            <select name="blood-group" value={patientState.bloodGroup} onChange={bloodGroupChangeHandler}>
+                            <select name="blood-group" value={patientState.bloodGroup} onChange={bloodGroupChangeHandler} className="form-control">
                                 <option>Select an option </option>
                                 <option value="O+">O+ve</option>
                                 <option value="O-">O-ve</option>
@@ -126,34 +133,32 @@ const AddPatient = () => {
                                 <option value="B+">B+</option>
                             </select>
                         </div>
-                        <br />
                         <div className="form-group">
                             <label htmlFor="height">Height</label>
                             <input type="number" 
                             name='height' 
-                            id='height'
+                            id='height' className="form-control"
                             min='0.0'
                             value={patientState.height}
                             onChange={heightChangeHandler}/>
                         </div>
-                        <br />
                         <div className="form-group">
                             <label htmlFor="weight">Weight</label>
                             <input type="number" 
                             name='weight'
-                            id='weight'
+                            id='weight' className="form-control"
                             min='5' 
                             value={patientState.weight}
                             onChange={wieghtChangeHandler}/>
-                        </div><br /> <br />
+                        </div><br />
                          <div className="form-group">
                                 <div className="row">
                                     <div className="col-6">
-                                        <button className="btn btn-primary btn-block" 
+                                        <button className="btn btn-success btn-block" 
                                             type="button" onClick={saveClickHandler}>save</button>
                                     </div>
                                     <div className="col-6">
-                                        <button className="btn btn-warning btn-block"
+                                        <button className="btn btn-danger btn-block"
                                             type="button" onClick={cancelClickHandler}>Cancel</button>
                                     </div>
                                 </div>
@@ -164,4 +169,7 @@ const AddPatient = () => {
         </div>
     )
 }
-export default AddPatient;
+export default Administrator;
+function useNavigate() {
+    throw new Error("Function not implemented.");
+}
